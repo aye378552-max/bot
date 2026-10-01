@@ -4,8 +4,8 @@ import requests
 app = Flask(__name__)
 
 # הכנס כאן את מפתח ה-API שיצרת ב-Google AI Studio
-GEMINI_API_KEY = "AQ.Ab8RN6LiWsz8g5MIp0Eyr_X3tQt3g8ekbCbOk8p98UAQwoVDug"GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-
+GEMINI_API_KEY = "AQ.Ab8RN6LiWsz8g5MIp0Eyr_X3tQt3g8ekbCbOk8p98UAQwoVDug"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 @app.route('/', methods=['POST'])
 def google_chat_bot():
     event = request.json
