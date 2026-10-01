@@ -3,8 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-# הכנס כאן את מפתח ה-API שלך מ-Google AI Studio
-GEMINI_API_KEY = "הכנס_כאן_את_המפתח_שליך"
+GEMINI_API_KEY = "הכנס_כאן_את_המפתח_שלך"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route('/', methods=['POST'])
@@ -15,21 +14,17 @@ def google_chat_bot():
     user_message = ""
     
     if event:
-        # חילוץ הטקסט מתוך המבנה של Google Chat / Workspace Add-ons
-        if 'commonEventObject' in event and 'parameters' in event['commonEventObject']:
+        # חילוץ הטקסט מכל אפשרות אפשרית שהצ'אט שולח
+        if 'message' in event and 'text' in event['message']:
+            user_message = event['message']['text']
+        elif 'text' in event:
+            user_message = event['text']
+        elif 'commonEventObject' in event and 'parameters' in event['commonEventObject']:
             user_message = event['commonEventObject']['parameters'].get('text', '')
             
-        if not user_message and 'message' in event:
-            user_message = event['message'].get('text', '')
-            
-        if not user_message and 'text' in event:
-            user_message = event['text']
-            
-    # אם לא נמצא טקסט בהודעה, נציג ברירת מחדל
     if not user_message:
-        user_message = "שלום!"
+        user_message = "שלום! הבוט מחובר בהצלחה."
 
-    # בניית הבקשה עבור Gemini API
     payload = {
         "contents": [{
             "parts": [{"text": user_message}]
@@ -46,15 +41,14 @@ def google_chat_bot():
                 ai_response_text = data['candidates'][0]['content']['parts'][0]['text']
             except (KeyError, IndexError):
                 pass
-        else:
-            ai_response_text = f"שגיאת תקשורת מול גוגל (קוד {response.status_code})"
     except Exception as e:
         ai_response_text = f"שגיאה: {str(e)}"
         
-    # החזרת התשובה בפורמט המלא לגוגל צ'אט
-    return jsonify({
-        "text": ai_response_text
-    }), 200, {'Content-Type': 'application/json'}
+    # הדפסה ללוגים כדי לראות בדיוק מה אנחנו שולחים בחזרה
+    response_data = {"text": ai_response_text}
+    print("Sending response:", response_data)
+    
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(port=8080)
