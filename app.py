@@ -3,31 +3,31 @@ import requests
 
 app = Flask(__name__)
 
+# הכנס כאן את מפתח ה-API שלך מ-Google AI Studio
 GEMINI_API_KEY = "הכנס_כאן_את_המפתח_שליך"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route('/', methods=['POST'])
 def google_chat_bot():
     event = request.json
+    print("Received event:", event)
     
     user_message = ""
     
     if event:
-        # בדיקה אם ההודעה מגיעה במבנה של Google Workspace Add-on / Google Chat חדש
+        # חילוץ הטקסט מתוך המבנה של Google Chat / Workspace Add-ons
         if 'commonEventObject' in event and 'parameters' in event['commonEventObject']:
             user_message = event['commonEventObject']['parameters'].get('text', '')
             
-        # בדיקה אם ההודעה מגיעה כמבנה הודעה ישיר
         if not user_message and 'message' in event:
             user_message = event['message'].get('text', '')
             
-        # בדיקה בנתיבים חלופיים
         if not user_message and 'text' in event:
             user_message = event['text']
             
-    # אם עדיין לא נמצא טקסט, ננסה לחלץ מתוך הטקסט של האירוע או שנחזיר תגובת בדיקה שמציגה שהבוט מחובר
+    # אם לא נמצא טקסט בהודעה, נציג ברירת מחדל
     if not user_message:
-        user_message = "שלום, אנא אמור לי במה תרצה עזרה."
+        user_message = "שלום!"
 
     # בניית הבקשה עבור Gemini API
     payload = {
@@ -46,12 +46,15 @@ def google_chat_bot():
                 ai_response_text = data['candidates'][0]['content']['parts'][0]['text']
             except (KeyError, IndexError):
                 pass
+        else:
+            ai_response_text = f"שגיאת תקשורת מול גוגל (קוד {response.status_code})"
     except Exception as e:
         ai_response_text = f"שגיאה: {str(e)}"
         
+    # החזרת התשובה בפורמט המלא לגוגל צ'אט
     return jsonify({
         "text": ai_response_text
-    })
+    }), 200, {'Content-Type': 'application/json'}
 
 if __name__ == '__main__':
     app.run(port=8080)
