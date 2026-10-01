@@ -41,10 +41,32 @@ def google_chat_bot():
     except Exception as e:
         ai_response_text = f"שגיאה: {str(e)}"
         
-    # החזרת טקסט רגיל וישיר לגוגל צ'אט
-    return jsonify({
-        "text": ai_response_text
-    })
+    # מבנה cardsV2 המתאים ביותר לתוספי Google Chat / Workspace
+    response_data = {
+        "cardsV2": [
+            {
+                "cardId": "gemini_response_card",
+                "card": {
+                    "header": {
+                        "title": "תשובה מ-Gemini"
+                    },
+                    "sections": [
+                        {
+                            "widgets": [
+                                {
+                                    "textParagraph": {
+                                        "text": ai_response_text
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+    
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run(port=8080)
