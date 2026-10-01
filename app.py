@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "AQ.Ab8RN6IR9mK5J-TfZxZa3ShYFAFVuELMEaAmLyVSJ-O77n3D5A"
+GEMINI_API_KEY = "AQ.Ab8RN6KTzdhS3JwexEL35bu_L25xhBM1CWls6qx9tssUsY3Pbwד"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route('/', methods=['POST'])
