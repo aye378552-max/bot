@@ -14,17 +14,20 @@ def google_chat_bot():
     user_message = ""
     
     if event:
-        # חילוץ הטקסט מכל אפשרות אפשרית שהצ'אט שולח
-        if 'message' in event and 'text' in event['message']:
-            user_message = event['message']['text']
-        elif 'text' in event:
-            user_message = event['text']
-        elif 'commonEventObject' in event and 'parameters' in event['commonEventObject']:
+        # חילוץ הטקסט מתוך הנתונים שמגיעים מתוסף ה-Workspace
+        if 'commonEventObject' in event and 'parameters' in event['commonEventObject']:
             user_message = event['commonEventObject']['parameters'].get('text', '')
             
+        if not user_message and 'message' in event and 'text' in event['message']:
+            user_message = event['message']['text']
+            
+        if not user_message and 'text' in event:
+            user_message = event['text']
+            
     if not user_message:
-        user_message = "שלום! הבוט מחובר בהצלחה."
+        user_message = "שלום! הבוט מחובר ומוכן לפעולה."
 
+    # שליחת הבקשה ל-Gemini API
     payload = {
         "contents": [{
             "parts": [{"text": user_message}]
@@ -44,10 +47,35 @@ def google_chat_bot():
     except Exception as e:
         ai_response_text = f"שגיאה: {str(e)}"
         
-    # הדפסה ללוגים כדי לראות בדיוק מה אנחנו שולחים בחזרה
-    response_data = {"text": ai_response_text}
-    print("Sending response:", response_data)
+    # מבנה תשובה המותאם ל-Google Workspace Add-on (כרטיסייה עם טקסט)
+    response_data = {
+        "renderActions": {
+            "action": {
+                "navigations": [
+                    {
+                        "pushCard": {
+                            "header": {
+                                "title": "תשובה מ-Gemini"
+                            },
+                            "sections": [
+                                {
+                                    "widgets": [
+                                        {
+                                            "textParagraph": {
+                                                "text": ai_response_text
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
     
+    print("Sending response:", response_data)
     return jsonify(response_data)
 
 if __name__ == '__main__':
