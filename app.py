@@ -1,9 +1,11 @@
+import os
 from flask import Flask, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "AQ.Ab8RN6KTzdhS3JwexEL35bu_L25xhBM1CWls6qx9tssUsY3Pbw"
+# המפתח נקרא ישירות מתוך משתני הסביבה של השרת בצורה מאובטחת
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route('/', methods=['POST'])
