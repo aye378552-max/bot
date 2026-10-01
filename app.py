@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-GEMINI_API_KEY = "AQ.Ab8RN6KTzdhS3JwexEL35bu_L25xhBM1CWls6qx9tssUsY3Pbwד"
+GEMINI_API_KEY = "AQ.Ab8RN6KTzdhS3JwexEL35bu_L25xhBM1CWls6qx9tssUsY3Pbw"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route('/', methods=['POST'])
@@ -41,7 +41,6 @@ def google_chat_bot():
     except Exception as e:
         ai_response_text = f"שגיאה: {str(e)}"
         
-    # מבנה cardsV2 המתאים ביותר לתוספי Google Chat / Workspace
     response_data = {
         "cardsV2": [
             {
